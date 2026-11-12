@@ -2,48 +2,53 @@ const readline = require('readline');
 
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
-});
-
-let operators = ['+', '-', '*', '/'];
-
-function usrInput(message) {
-  return new Promise((resolve, reject) => {
-    rl.question(message, (answer) => {
-      resolve(answer);
+    output: process.stdout
     });
-  });
-}
 
-console.log("NodeJS Simple Calculator")
+    const operations = {
+      '+': (a, b) => a + b,
+        '-': (a, b) => a - b,
+          '*': (a, b) => a * b,
+            '/': (a, b) => (b === 0 ? 'Error: Cannot divide by zero' : a / b)
+            };
 
-async function startCalcPrompt() {
-    var first = await usrInput(`Enter first number: `);
+            function usrInput(message) {
+              return new Promise((resolve) => {
+                  rl.question(message, (answer) => resolve(answer.trim()));
+                    });
+                    }
 
-    if (!Number.parseFloat(first) || !first) {
-        console.log(`You must enter a number`);
-        process.exit(0);
-      }
+                    console.log('NodeJS Simple Calculator');
 
-    var second = await usrInput(`Enter second number: `);
+                    async function startCalcPrompt() {
+                      const firstInput = await usrInput('Enter first number: ');
+                        const first = Number(firstInput);
+                          if (firstInput === '' || Number.isNaN(first)) {
+                              console.log('You must enter a valid number.');
+                                  rl.close();
+                                      return;
+                                        }
 
-    if (!Number.parseFloat(second) || !second) {
-        console.log(`You must enter a number`);
-        process.exit(0);
-      }
+                                          const secondInput = await usrInput('Enter second number: ');
+                                            const second = Number(secondInput);
+                                              if (secondInput === '' || Number.isNaN(second)) {
+                                                  console.log('You must enter a valid number.');
+                                                      rl.close();
+                                                          return;
+                                                            }
 
-    var operator = await usrInput(`Enter operator [${operators.join(", ")}]: `);
+                                                              const operators = Object.keys(operations);
+                                                                const operator = await usrInput(`Enter operator [${operators.join(', ')}]: `);
+                                                                  if (!Object.hasOwn(operations, operator)) {
+                                                                      console.log(`The available operators are: ${operators.join(', ')}`);
+                                                                          rl.close();
+                                                                              return;
+                                                                                }
 
-    if (!operators.includes(operator) || !operator) {
-    console.log(`The available operators are: ${operators.join(", ")}`);
-    process.exit(0);
-    }
+                                                                                  const result = operations[operator](first, second);
+                                                                                    console.log(result);
+                                                                                      rl.close();
+                                                                                      }
 
-    const calc = s => Function(`return(${s})`)();
-    const result = calc(first+operator+second);
-
-    console.log(result);
-  rl.close();
-}
-
-startCalcPrompt()
+                                                                                      startCalcPrompt();
+                                                                                      
